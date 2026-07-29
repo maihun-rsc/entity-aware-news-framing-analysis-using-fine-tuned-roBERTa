@@ -1,0 +1,13 @@
+services:
+  - type: web
+    name: news-sentiment-api
+    env: python
+    buildCommand: "pip install -r requirements-prod.txt && python -m spacy download en_core_web_sm"
+    startCommand: "uvicorn webapp_render.server:app --host 0.0.0.0 --port $PORT"
+    envVars:
+      - key: PYTHON_VERSION
+        value: 3.10.12
+      - key: USE_BART
+        value: "false" # Free tier has 512MB RAM, BART-Large will cause Out-Of-Memory (OOM)
+      - key: MLFLOW_TRACKING_URI
+        value: "" # Fill this in the Render dashboard if using remote MLflow
