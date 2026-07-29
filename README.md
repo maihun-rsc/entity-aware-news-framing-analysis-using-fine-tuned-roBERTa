@@ -171,6 +171,25 @@ The code detects at runtime whether it's running on Kaggle (checks `/kaggle/inpu
 
 ---
 
+## ✨ Recent System Enhancements & Production Features
+
+### 1. True Entity-Centric Framing Analysis
+- **Syntactic Proximity Scoring ($s_i$)**: Aligned real subword token proximity decay scores ($s_i = \frac{1}{1 + d(i, E)}$) with RoBERTa's `EntityAwareAttention` layer ($\alpha_i = \text{softmax}(W_e h_i + W_s s_i)$), allowing the attention head to attend specifically to words surrounding the target entity.
+- **Entity-Focused Context Windowing**: Scans full article texts to extract paragraphs specifically mentioning the target entity rather than relying on generic article intros.
+- **Entity-Anchored Hypotheses**: Formulates target-bound zero-shot prompts: `"In this news text, the target entity 'X' is portrayed in a way that is {}"`.
+- **Cross-Entity Framing Comparison**: Interactive web interfaces generate comparative framing breakdowns for all prominent entities detected in an article.
+
+### 2. Dual Web Application Support
+- **Interactive Local Console (`webapp/`)**: Full-featured UI running on port 8000 with GPU support, custom RoBERTa inference, BART-large-mnli zero-shot ensemble, and real-time MLflow experiment tracking (`mlflow.db`).
+- **Render Cloud Deployment (`webapp_render/`)**: Lightweight deployment optimized for Render Free Tier (512MB RAM limit) using CPU DistilBERT and declarative `render.yaml`.
+
+### 3. Pipeline Resilience & Fault Tolerance
+- **403 Scraping Impersonation**: Uses `curl_cffi` with Chrome 120 TLS fingerprinting to bypass anti-bot scrapers.
+- **Auto-Annotation Fallback Ladder**: Graceful degradation under memory pressure (`BART-Large GPU` $\rightarrow$ `DistilBERT GPU` $\rightarrow$ `DistilBERT CPU`).
+- **Imbalanced Class Split Handling**: Reverts to unstratified splits if rare framing classes contain $<2$ samples, preventing baseline training crashes.
+
+---
+
 ## 🏃 Sprint Plan
 
 | Sprint | Module | Deliverable |
@@ -190,9 +209,13 @@ The code detects at runtime whether it's running on Kaggle (checks `/kaggle/inpu
    ```bash
    pip install -r requirements.txt
    ```
-2. **Execute the Pipeline:**  
+2. **Execute the Batch Pipeline:**  
    ```bash
    python main.py
+   ```
+3. **Launch Local Interactive WebApp:**  
+   ```bash
+   uvicorn webapp.server:app --host 127.0.0.1 --port 8000 --reload
    ```
 
 *(Note: Data is automatically saved into the `data/` directory, which is excluded from version control to protect data privacy and reduce repository bloat).*
