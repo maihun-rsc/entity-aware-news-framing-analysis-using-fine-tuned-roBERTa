@@ -68,7 +68,7 @@ news_sentiment/
 
 ---
 
-## 🗃️ Data Collection
+# Module 1: Data Collection
 
 ### What it does
 
